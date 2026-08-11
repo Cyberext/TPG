@@ -1,0 +1,612 @@
+
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --g:#b7d63f;--g2:#8fa832;--dark:#1a1a1a;--black:#111;
+    --card:#1f1f1f;--card2:#252525;--border:#2e2e2e;
+    --text:#f0f0f0;--muted:#888;--dim:#555;
+  }
+  body{background:transparent}
+  #wrap{font-family:'Segoe UI',system-ui,sans-serif;background:var(--black);color:var(--text);border-radius:12px;overflow:hidden;min-height:600px}
+  .header{background:var(--dark);border-bottom:1px solid var(--border);padding:20px 24px;display:flex;align-items:center;gap:16px}
+  .logo-pill{background:var(--g);color:#111;font-size:11px;font-weight:700;letter-spacing:1px;padding:4px 10px;border-radius:20px;text-transform:uppercase}
+  .header h1{font-size:16px;font-weight:600;color:var(--text)}
+  .header p{font-size:12px;color:var(--muted);margin-top:2px}
+  .tabs{display:flex;gap:0;border-bottom:1px solid var(--border);background:var(--dark);padding:0 16px;overflow-x:auto}
+  .tab{padding:12px 16px;font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all .2s;flex-shrink:0}
+  .tab.active{color:var(--g);border-bottom-color:var(--g)}
+  .tab:hover:not(.active){color:var(--text)}
+  .body{padding:24px}
+  .section{display:none}
+  .section.active{display:block}
+  h2{font-size:14px;font-weight:600;color:var(--g);margin-bottom:16px;text-transform:uppercase;letter-spacing:.5px}
+  h3{font-size:13px;font-weight:600;color:var(--text);margin-bottom:8px}
+  p,li{font-size:13px;color:var(--muted);line-height:1.6}
+
+  /* Brand */
+  .brand-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .logo-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px}
+  .logo-mock{width:80px;height:80px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:22px;font-weight:800;letter-spacing:-1px}
+  .logo-mock.prop{border:3px solid var(--g);color:var(--g);background:#111}
+  .logo-mock.dev{background:var(--g);color:#111;border:3px solid var(--g2)}
+  .logo-label{text-align:center;font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px}
+  .logo-sub{text-align:center;font-size:11px;color:var(--muted)}
+  .badge-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+  .badge{font-size:10px;padding:3px 8px;border-radius:12px;font-weight:600;border:1px solid var(--border)}
+  .badge.green{background:#1a2206;color:var(--g);border-color:#2d3d0a}
+  .badge.gray{background:#222;color:#aaa;border-color:#333}
+  .palette{display:flex;gap:8px;margin-top:12px}
+  .swatch{flex:1;height:36px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700}
+  .trait-list{margin-top:12px;display:flex;flex-direction:column;gap:6px}
+  .trait{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
+  .trait::before{content:'✓';color:var(--g);font-weight:700;font-size:11px}
+
+  /* Architecture */
+  .arch-tree{display:flex;flex-direction:column;gap:12px}
+  .arch-layer{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+  .arch-header{background:var(--card2);padding:10px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)}
+  .arch-icon{width:28px;height:28px;border-radius:6px;background:var(--g);color:#111;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0}
+  .arch-title{font-size:13px;font-weight:700;color:var(--text)}
+  .arch-sub{font-size:11px;color:var(--muted)}
+  .tech-chips{display:flex;flex-wrap:wrap;gap:6px;padding:12px 16px}
+  .chip{font-size:11px;padding:4px 10px;border-radius:16px;border:1px solid var(--border);color:var(--muted);background:var(--dark)}
+  .chip.hot{border-color:#2d3d0a;color:var(--g);background:#111}
+
+  /* Pages */
+  .pages-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .page-card{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+  .page-header{padding:12px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+  .page-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+  .page-title{font-size:13px;font-weight:700;color:var(--text)}
+  .page-path{font-size:10px;color:var(--dim);font-family:monospace}
+  .page-sections{padding:10px 14px;display:flex;flex-direction:column;gap:4px}
+  .ps-item{font-size:11px;color:var(--muted);padding:3px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px}
+  .ps-item:last-child{border:none}
+  .ps-item::before{content:'›';color:var(--g)}
+  .gsap-tag{font-size:9px;background:#1a2206;color:var(--g);border:1px solid #2d3d0a;padding:1px 5px;border-radius:8px;margin-left:auto}
+
+  /* DB Schema */
+  .schema-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .table-card{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+  .table-head{background:var(--g);padding:8px 12px}
+  .table-name{font-size:12px;font-weight:800;color:#111}
+  .field-list{padding:8px 0}
+  .field{display:flex;align-items:center;gap:6px;padding:5px 12px;border-bottom:1px solid var(--border)}
+  .field:last-child{border:none}
+  .field-name{font-size:11px;color:var(--text);font-family:monospace}
+  .field-type{font-size:10px;color:var(--dim);margin-left:auto;font-family:monospace}
+  .field-pk{font-size:9px;background:#1a2206;color:var(--g);padding:1px 4px;border-radius:4px;border:1px solid #2d3d0a}
+  .field-fk{font-size:9px;background:#1c1600;color:#f0a500;padding:1px 4px;border-radius:4px;border:1px solid #3a2e00}
+
+  /* API */
+  .api-group{margin-bottom:16px}
+  .api-base{font-size:11px;color:var(--g);font-family:monospace;margin-bottom:8px;font-weight:700}
+  .api-route{display:flex;align-items:center;gap:8px;padding:7px 12px;background:var(--card);border:1px solid var(--border);border-radius:6px;margin-bottom:4px}
+  .method{font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;min-width:38px;text-align:center;font-family:monospace}
+  .get{background:#0a2040;color:#5ab4f5}
+  .post{background:#0a2a0a;color:#5dd15d}
+  .put{background:#2a1f00;color:#f0a500}
+  .delete{background:#2a0a0a;color:#f55}
+  .route-path{font-size:11px;color:var(--text);font-family:monospace}
+  .route-desc{font-size:11px;color:var(--dim);margin-left:auto}
+
+  /* Roadmap */
+  .phases{display:flex;flex-direction:column;gap:12px}
+  .phase{display:flex;gap:14px;align-items:flex-start}
+  .phase-num{width:32px;height:32px;border-radius:50%;background:var(--g);color:#111;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .phase-num.done{background:var(--card2);color:var(--dim);border:1px solid var(--border)}
+  .phase-body{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 16px;flex:1}
+  .phase-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px}
+  .phase-tasks{display:flex;flex-wrap:wrap;gap:5px}
+  .task{font-size:10px;padding:3px 8px;border-radius:10px;border:1px solid var(--border);color:var(--muted);background:var(--dark)}
+
+  /* Security */
+  .sec-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .sec-item{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px 14px;display:flex;gap:10px;align-items:flex-start}
+  .sec-icon{width:24px;height:24px;background:#1a2206;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+  .sec-title{font-size:12px;font-weight:700;color:var(--text)}
+  .sec-desc{font-size:11px;color:var(--muted);margin-top:2px}
+</style>
+<div id="wrap">
+  <div class="header">
+    <div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+        <span class="logo-pill">TPG Group</span>
+        <span style="font-size:11px;color:var(--dim)">Full-Stack Architecture Blueprint</span>
+      </div>
+      <h1>MERN + TypeScript · Next.js 15 · GSAP · Enterprise Grade</h1>
+      <p>Brand analysis · System design · Database · API · DevOps · Roadmap</p>
+    </div>
+  </div>
+  <div class="tabs">
+    <div class="tab active" onclick="show('brand',this)">Brand System</div>
+    <div class="tab" onclick="show('arch',this)">Architecture</div>
+    <div class="tab" onclick="show('pages',this)">Pages & UX</div>
+    <div class="tab" onclick="show('db',this)">Database</div>
+    <div class="tab" onclick="show('api',this)">API Routes</div>
+    <div class="tab" onclick="show('security',this)">Security</div>
+    <div class="tab" onclick="show('roadmap',this)">Roadmap</div>
+  </div>
+
+  <div class="body">
+
+    <!-- BRAND -->
+    <div id="brand" class="section active">
+      <h2>Logo Analysis & Brand DNA</h2>
+      <div class="brand-grid" style="margin-bottom:16px">
+        <div class="logo-card">
+          <div class="logo-mock prop">tpG</div>
+          <div class="logo-label">TPG Properties</div>
+          <div class="logo-sub">House roof merged into lettermark</div>
+          <div class="badge-row">
+            <span class="badge green">Circular Frame</span>
+            <span class="badge green">Dual Sweep</span>
+            <span class="badge gray">Charcoal + Lime</span>
+            <span class="badge gray">Open, Dynamic</span>
+          </div>
+          <div class="trait-list">
+            <div class="trait">Lime sweep = growth & momentum</div>
+            <div class="trait">Charcoal body = authority & trust</div>
+            <div class="trait">House icon = instant real estate identity</div>
+            <div class="trait">Mood: welcoming, luxury, residential</div>
+          </div>
+        </div>
+        <div class="logo-card">
+          <div class="logo-mock dev">TPG</div>
+          <div class="logo-label">TPG Developers</div>
+          <div class="logo-sub">Roof lines as structural grid marks</div>
+          <div class="badge-row">
+            <span class="badge green">Technical Grid</span>
+            <span class="badge green">Blueprint Lines</span>
+            <span class="badge gray">Lime Circle</span>
+            <span class="badge gray">Industrial</span>
+          </div>
+          <div class="trait-list">
+            <div class="trait">Grid marks = engineering precision</div>
+            <div class="trait">Strong lime circle = boldness</div>
+            <div class="trait">Structural roof = construction expertise</div>
+            <div class="trait">Mood: technical, industrial, built</div>
+          </div>
+        </div>
+      </div>
+      <h2>Global Design Tokens</h2>
+      <div class="logo-card" style="margin-bottom:12px">
+        <h3 style="margin-bottom:10px">Color System</h3>
+        <div class="palette">
+          <div class="swatch" style="background:#b7d63f;color:#111">Primary<br>#b7d63f</div>
+          <div class="swatch" style="background:#8fa832;color:#111">Dark<br>#8fa832</div>
+          <div class="swatch" style="background:#1f1f1f;color:#f0f0f0">Charcoal<br>#1f1f1f</div>
+          <div class="swatch" style="background:#111;color:#f0f0f0;border:1px solid #2e2e2e">Black<br>#111111</div>
+          <div class="swatch" style="background:#f5f5f5;color:#111">Light<br>#f5f5f5</div>
+          <div class="swatch" style="background:#fff;color:#111;border:1px solid #ddd">White<br>#ffffff</div>
+        </div>
+        <div style="margin-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div>
+            <h3 style="margin-bottom:6px">Typography</h3>
+            <p style="margin-bottom:4px">Display: <span style="color:var(--g)">Clash Display / General Sans</span></p>
+            <p style="margin-bottom:4px">Body: <span style="color:var(--g)">Inter</span></p>
+            <p>Mono: <span style="color:var(--g)">JetBrains Mono</span></p>
+          </div>
+          <div>
+            <h3 style="margin-bottom:6px">Design Principles</h3>
+            <div class="trait-list">
+              <div class="trait" style="margin:0">Massive whitespace</div>
+              <div class="trait" style="margin:0">Cinematic imagery</div>
+              <div class="trait" style="margin:0">Restrained animations</div>
+              <div class="trait" style="margin:0">Strong grid systems</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="logo-card">
+        <h3 style="margin-bottom:10px">GSAP Animation Philosophy</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div>
+            <p style="color:var(--g);font-size:11px;font-weight:700;margin-bottom:6px">USE — Luxury Motion</p>
+            <div class="trait-list">
+              <div class="trait" style="margin:0;font-size:11px">Hero text stagger reveal</div>
+              <div class="trait" style="margin:0;font-size:11px">ScrollTrigger parallax</div>
+              <div class="trait" style="margin:0;font-size:11px">Image mask reveals</div>
+              <div class="trait" style="margin:0;font-size:11px">Pinned scroll sections</div>
+              <div class="trait" style="margin:0;font-size:11px">Horizontal galleries</div>
+              <div class="trait" style="margin:0;font-size:11px">Counter animations</div>
+            </div>
+          </div>
+          <div>
+            <p style="color:#f55;font-size:11px;font-weight:700;margin-bottom:6px">AVOID — Cheap Motion</p>
+            <div style="display:flex;flex-direction:column;gap:5px">
+              <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted)"><span style="color:#f55">✕</span>Excessive bouncing</div>
+              <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted)"><span style="color:#f55">✕</span>Flashy particle FX</div>
+              <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted)"><span style="color:#f55">✕</span>Heavy every-element animation</div>
+              <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted)"><span style="color:#f55">✕</span>Auto-playing carousels</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ARCHITECTURE -->
+    <div id="arch" class="section">
+      <h2>System Architecture — Monorepo (MERN + TS)</h2>
+      <div class="arch-tree">
+        <div class="arch-layer">
+          <div class="arch-header">
+            <div class="arch-icon">FE</div>
+            <div><div class="arch-title">Frontend — Next.js 15 + TypeScript</div><div class="arch-sub">App Router · SSR · ISR · Edge Rendering</div></div>
+          </div>
+          <div class="tech-chips">
+            <span class="chip hot">Next.js 15</span><span class="chip hot">TypeScript</span><span class="chip hot">TailwindCSS</span><span class="chip hot">GSAP + ScrollTrigger</span><span class="chip hot">Framer Motion</span><span class="chip">Zustand</span><span class="chip">TanStack Query</span><span class="chip">Shadcn/UI</span><span class="chip">Lenis Smooth Scroll</span><span class="chip">React Hook Form</span><span class="chip">Zod</span><span class="chip">next/image</span>
+          </div>
+        </div>
+        <div class="arch-layer">
+          <div class="arch-header">
+            <div class="arch-icon" style="background:#3b6d11">BE</div>
+            <div><div class="arch-title">Backend — Node.js + Express + TypeScript</div><div class="arch-sub">REST API · JWT Auth · Socket.io · Background Jobs</div></div>
+          </div>
+          <div class="tech-chips">
+            <span class="chip hot">Node.js</span><span class="chip hot">Express.js</span><span class="chip hot">TypeScript</span><span class="chip hot">MongoDB + Mongoose</span><span class="chip">JWT + Refresh Tokens</span><span class="chip">Redis (cache)</span><span class="chip">Socket.io</span><span class="chip">BullMQ</span><span class="chip">Cloudinary</span><span class="chip">Nodemailer</span><span class="chip">Helmet</span><span class="chip">Zod</span>
+          </div>
+        </div>
+        <div class="arch-layer">
+          <div class="arch-header">
+            <div class="arch-icon" style="background:#185fa5">DB</div>
+            <div><div class="arch-title">Data Layer — MongoDB Atlas + Redis</div><div class="arch-sub">Flexible document schema · Caching · Sessions</div></div>
+          </div>
+          <div class="tech-chips">
+            <span class="chip hot">MongoDB Atlas</span><span class="chip hot">Redis Cloud</span><span class="chip">Mongoose ODM</span><span class="chip">Aggregation Pipelines</span><span class="chip">Geospatial Indexes</span><span class="chip">Full-text Search</span>
+          </div>
+        </div>
+        <div class="arch-layer">
+          <div class="arch-header">
+            <div class="arch-icon" style="background:#854f0b">AD</div>
+            <div><div class="arch-title">Admin Dashboard — React + Shadcn</div><div class="arch-sub">CMS · CRM · Analytics · RBAC</div></div>
+          </div>
+          <div class="tech-chips">
+            <span class="chip hot">React + Vite</span><span class="chip">Recharts</span><span class="chip">Shadcn/UI</span><span class="chip">RBAC Roles</span><span class="chip">Cloudinary Upload</span><span class="chip">Real-time Inquiries</span>
+          </div>
+        </div>
+        <div class="arch-layer">
+          <div class="arch-header">
+            <div class="arch-icon" style="background:#533ab7">OPS</div>
+            <div><div class="arch-title">DevOps & Infrastructure</div><div class="arch-sub">Docker · CI/CD · Vercel · AWS ECS</div></div>
+          </div>
+          <div class="tech-chips">
+            <span class="chip hot">Docker + Compose</span><span class="chip hot">GitHub Actions</span><span class="chip">NGINX (reverse proxy)</span><span class="chip">Vercel (frontend)</span><span class="chip">Railway / AWS ECS</span><span class="chip">MongoDB Atlas</span><span class="chip">Sentry</span><span class="chip">Cloudflare CDN</span>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:16px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px">
+        <h3 style="margin-bottom:10px;font-size:12px;color:var(--g);text-transform:uppercase;letter-spacing:.5px">Monorepo Structure — tpg-platform/</h3>
+        <pre style="font-size:11px;color:var(--muted);line-height:1.7;font-family:monospace">tpg-platform/
+├── apps/
+│   ├── web/          ← Next.js 15 (Properties home + Developers)
+│   ├── api/          ← Express REST API + Socket.io
+│   └── admin/        ← Admin CMS dashboard
+├── packages/
+│   ├── ui/           ← Shared component library
+│   ├── types/        ← Shared TypeScript types
+│   ├── config/       ← ESLint, TSConfig, Tailwind base
+│   └── utils/        ← Shared utilities
+├── docker/           ← Docker configs
+├── nginx/            ← Reverse proxy config
+└── scripts/          ← DB seeds, migrations</pre>
+      </div>
+    </div>
+
+    <!-- PAGES -->
+    <div id="pages" class="section">
+      <h2>Pages, Routes & GSAP Integration</h2>
+      <div class="pages-grid">
+        <div class="page-card">
+          <div class="page-header">
+            <div class="page-dot" style="background:var(--g)"></div>
+            <div>
+              <div class="page-title">TPG Properties — Home</div>
+              <div class="page-path">/ (main landing)</div>
+            </div>
+          </div>
+          <div class="page-sections">
+            <div class="ps-item">Hero: cinematic headline + video BG<span class="gsap-tag">GSAP</span></div>
+            <div class="ps-item">Featured Listings grid w/ hover fx<span class="gsap-tag">GSAP</span></div>
+            <div class="ps-item">Property search bar (live filter)</div>
+            <div class="ps-item">Animated stats (counter anim)<span class="gsap-tag">GSAP</span></div>
+            <div class="ps-item">Interactive property map</div>
+            <div class="ps-item">Property categories carousel</div>
+            <div class="ps-item">Testimonials (fade scroll)<span class="gsap-tag">GSAP</span></div>
+            <div class="ps-item">CTA + Newsletter footer</div>
+          </div>
+        </div>
+        <div class="page-card">
+          <div class="page-header">
+            <div class="page-dot" style="background:#8fa832"></div>
+            <div>
+              <div class="page-title">Properties Listing</div>
+              <div class="page-path">/properties</div>
+            </div>
+          </div>
+          <div class="page-sections">
+            <div class="ps-item">Advanced filter sidebar (price/beds/type)</div>
+            <div class="ps-item">Grid / List view toggle</div>
+            <div class="ps-item">Infinite scroll + skeleton loaders</div>
+            <div class="ps-item">Sort: price / date / featured</div>
+            <div class="ps-item">Map panel (split view)<span class="gsap-tag">GSAP</span></div>
+            <div class="ps-item">Saved search + favorites</div>
+          </div>
+        </div>
+        <div class="page-card">
+          <div class="page-header">
+            <div class="page-dot" style="background:#5ab4f5"></div>
+            <div>
+              <div class="page-title">Property Detail</div>
+              <div class="page-path">/properties/[slug]</div>
+            </div>
+          </div>
+          <div class="page-sections">
+            <div class="ps-item">Full-bleed gallery (GSAP mask)<span class="gsap-tag">GSAP</span></div>
+            <div class="ps-item">Virtual tour embed</div>
+            <div class="ps-item">Key stats (beds/baths/sqm)</div>
+            <div class="ps-item">Agent contact widget (real-time)</div>
+            <div class="ps-item">Similar properties</div>
+            <div class="ps-item">Neighborhood map</div>
+          </div>
+        </div>
+        <div class="page-card">
+          <div class="page-header">
+            <div class="page-dot" style="background:#f0a500"></div>
+            <div>
+              <div class="page-title">TPG Developers</div>
+              <div class="page-path">/developers</div>
+            </div>
+          </div>
+          <div class="page-sections">
+            <div class="ps-item">Dark hero: "Building The Future"<span class="gsap-tag">GSAP</span></div>
+            <div class="ps-item">Services: Construction, Renovation, Commercial</div>
+            <div class="ps-item">Portfolio horizontal scroll<span class="gsap-tag">GSAP</span></div>
+            <div class="ps-item">Pinned process timeline<span class="gsap-tag">GSAP</span></div>
+            <div class="ps-item">Project gallery (blueprint aesthetic)</div>
+            <div class="ps-item">Consultation booking CTA</div>
+          </div>
+        </div>
+        <div class="page-card">
+          <div class="page-header">
+            <div class="page-dot" style="background:#a32d2d"></div>
+            <div>
+              <div class="page-title">Rentals</div>
+              <div class="page-path">/rentals</div>
+            </div>
+          </div>
+          <div class="page-sections">
+            <div class="ps-item">Filter by price/area/lease term</div>
+            <div class="ps-item">Available date calendar</div>
+            <div class="ps-item">Tenant application flow</div>
+            <div class="ps-item">Virtual viewing scheduler</div>
+          </div>
+        </div>
+        <div class="page-card">
+          <div class="page-header">
+            <div class="page-dot" style="background:#888"></div>
+            <div>
+              <div class="page-title">Agents / Contact / About</div>
+              <div class="page-path">/agents · /contact · /about</div>
+            </div>
+          </div>
+          <div class="page-sections">
+            <div class="ps-item">Agent profiles with listings</div>
+            <div class="ps-item">Contact form + WhatsApp CTA</div>
+            <div class="ps-item">TPG Group story + team</div>
+            <div class="ps-item">Awards, credentials, trust signals</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DATABASE -->
+    <div id="db" class="section">
+      <h2>MongoDB Collections — Schema Design</h2>
+      <div class="schema-grid">
+        <div class="table-card">
+          <div class="table-head"><div class="table-name">users</div></div>
+          <div class="field-list">
+            <div class="field"><span class="field-name">_id</span><span class="field-pk">PK</span><span class="field-type">ObjectId</span></div>
+            <div class="field"><span class="field-name">name</span><span class="field-type">String</span></div>
+            <div class="field"><span class="field-name">email</span><span class="field-type">String</span></div>
+            <div class="field"><span class="field-name">passwordHash</span><span class="field-type">String</span></div>
+            <div class="field"><span class="field-name">role</span><span class="field-type">enum</span></div>
+            <div class="field"><span class="field-name">favorites[]</span><span class="field-fk">FK→prop</span><span class="field-type">ObjectId[]</span></div>
+            <div class="field"><span class="field-name">refreshToken</span><span class="field-type">String</span></div>
+            <div class="field"><span class="field-name">createdAt</span><span class="field-type">Date</span></div>
+          </div>
+        </div>
+        <div class="table-card">
+          <div class="table-head"><div class="table-name">properties</div></div>
+          <div class="field-list">
+            <div class="field"><span class="field-name">_id</span><span class="field-pk">PK</span><span class="field-type">ObjectId</span></div>
+            <div class="field"><span class="field-name">title</span><span class="field-type">String</span></div>
+            <div class="field"><span class="field-name">slug</span><span class="field-type">String</span></div>
+            <div class="field"><span class="field-name">type</span><span class="field-type">enum</span></div>
+            <div class="field"><span class="field-name">status</span><span class="field-type">enum</span></div>
+            <div class="field"><span class="field-name">price</span><span class="field-type">Number</span></div>
+            <div class="field"><span class="field-name">location{}</span><span class="field-type">GeoJSON</span></div>
+            <div class="field"><span class="field-name">images[]</span><span class="field-type">String[]</span></div>
+            <div class="field"><span class="field-name">bedrooms</span><span class="field-type">Number</span></div>
+            <div class="field"><span class="field-name">bathrooms</span><span class="field-type">Number</span></div>
+            <div class="field"><span class="field-name">amenities[]</span><span class="field-type">String[]</span></div>
+            <div class="field"><span class="field-name">agent</span><span class="field-fk">FK→user</span><span class="field-type">ObjectId</span></div>
+            <div class="field"><span class="field-name">featured</span><span class="field-type">Boolean</span></div>
+          </div>
+        </div>
+        <div class="table-card">
+          <div class="table-head"><div class="table-name">projects</div></div>
+          <div class="field-list">
+            <div class="field"><span class="field-name">_id</span><span class="field-pk">PK</span><span class="field-type">ObjectId</span></div>
+            <div class="field"><span class="field-name">title</span><span class="field-type">String</span></div>
+            <div class="field"><span class="field-name">category</span><span class="field-type">enum</span></div>
+            <div class="field"><span class="field-name">description</span><span class="field-type">String</span></div>
+            <div class="field"><span class="field-name">images[]</span><span class="field-type">String[]</span></div>
+            <div class="field"><span class="field-name">status</span><span class="field-type">enum</span></div>
+            <div class="field"><span class="field-name">completedAt</span><span class="field-type">Date</span></div>
+          </div>
+        </div>
+        <div class="table-card">
+          <div class="table-head"><div class="table-name">inquiries</div></div>
+          <div class="field-list">
+            <div class="field"><span class="field-name">_id</span><span class="field-pk">PK</span><span class="field-type">ObjectId</span></div>
+            <div class="field"><span class="field-name">user</span><span class="field-fk">FK→user</span><span class="field-type">ObjectId</span></div>
+            <div class="field"><span class="field-name">property</span><span class="field-fk">FK→prop</span><span class="field-type">ObjectId</span></div>
+            <div class="field"><span class="field-name">message</span><span class="field-type">String</span></div>
+            <div class="field"><span class="field-name">status</span><span class="field-type">enum</span></div>
+            <div class="field"><span class="field-name">createdAt</span><span class="field-type">Date</span></div>
+          </div>
+        </div>
+        <div class="table-card">
+          <div class="table-head"><div class="table-name">appointments</div></div>
+          <div class="field-list">
+            <div class="field"><span class="field-name">_id</span><span class="field-pk">PK</span><span class="field-type">ObjectId</span></div>
+            <div class="field"><span class="field-name">buyer</span><span class="field-fk">FK→user</span><span class="field-type">ObjectId</span></div>
+            <div class="field"><span class="field-name">agent</span><span class="field-fk">FK→user</span><span class="field-type">ObjectId</span></div>
+            <div class="field"><span class="field-name">property</span><span class="field-fk">FK→prop</span><span class="field-type">ObjectId</span></div>
+            <div class="field"><span class="field-name">scheduledAt</span><span class="field-type">Date</span></div>
+            <div class="field"><span class="field-name">type</span><span class="field-type">enum</span></div>
+            <div class="field"><span class="field-name">notes</span><span class="field-type">String</span></div>
+          </div>
+        </div>
+        <div class="table-card">
+          <div class="table-head"><div class="table-name">reviews</div></div>
+          <div class="field-list">
+            <div class="field"><span class="field-name">_id</span><span class="field-pk">PK</span><span class="field-type">ObjectId</span></div>
+            <div class="field"><span class="field-name">author</span><span class="field-fk">FK→user</span><span class="field-type">ObjectId</span></div>
+            <div class="field"><span class="field-name">property</span><span class="field-fk">FK→prop</span><span class="field-type">ObjectId</span></div>
+            <div class="field"><span class="field-name">rating</span><span class="field-type">Number</span></div>
+            <div class="field"><span class="field-name">body</span><span class="field-type">String</span></div>
+            <div class="field"><span class="field-name">createdAt</span><span class="field-type">Date</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- API ROUTES -->
+    <div id="api" class="section">
+      <h2>REST API Routes — /api/v1</h2>
+      <div class="api-group">
+        <div class="api-base">🏠 /api/v1/properties</div>
+        <div class="api-route"><span class="method get">GET</span><span class="route-path">/properties</span><span class="route-desc">List + filter + paginate</span></div>
+        <div class="api-route"><span class="method get">GET</span><span class="route-path">/properties/featured</span><span class="route-desc">Featured listings</span></div>
+        <div class="api-route"><span class="method get">GET</span><span class="route-path">/properties/:slug</span><span class="route-desc">Single property detail</span></div>
+        <div class="api-route"><span class="method post">POST</span><span class="route-path">/properties</span><span class="route-desc">Create listing (admin)</span></div>
+        <div class="api-route"><span class="method put">PUT</span><span class="route-path">/properties/:id</span><span class="route-desc">Update listing</span></div>
+        <div class="api-route"><span class="method delete">DEL</span><span class="route-path">/properties/:id</span><span class="route-desc">Remove listing</span></div>
+      </div>
+      <div class="api-group">
+        <div class="api-base">🔑 /api/v1/auth</div>
+        <div class="api-route"><span class="method post">POST</span><span class="route-path">/auth/register</span><span class="route-desc">New user signup</span></div>
+        <div class="api-route"><span class="method post">POST</span><span class="route-path">/auth/login</span><span class="route-desc">Issue JWT + refresh</span></div>
+        <div class="api-route"><span class="method post">POST</span><span class="route-path">/auth/refresh</span><span class="route-desc">Rotate refresh token</span></div>
+        <div class="api-route"><span class="method post">POST</span><span class="route-path">/auth/logout</span><span class="route-desc">Invalidate tokens</span></div>
+      </div>
+      <div class="api-group">
+        <div class="api-base">🏗️ /api/v1/projects</div>
+        <div class="api-route"><span class="method get">GET</span><span class="route-path">/projects</span><span class="route-desc">Developer portfolio list</span></div>
+        <div class="api-route"><span class="method get">GET</span><span class="route-path">/projects/:id</span><span class="route-desc">Project detail</span></div>
+        <div class="api-route"><span class="method post">POST</span><span class="route-path">/projects</span><span class="route-desc">Add project (admin)</span></div>
+        <div class="api-route"><span class="method put">PUT</span><span class="route-path">/projects/:id</span><span class="route-desc">Update project</span></div>
+      </div>
+      <div class="api-group">
+        <div class="api-base">📩 /api/v1/inquiries · /api/v1/appointments</div>
+        <div class="api-route"><span class="method post">POST</span><span class="route-path">/inquiries</span><span class="route-desc">Submit property inquiry</span></div>
+        <div class="api-route"><span class="method get">GET</span><span class="route-path">/inquiries</span><span class="route-desc">List (agent/admin)</span></div>
+        <div class="api-route"><span class="method post">POST</span><span class="route-path">/appointments</span><span class="route-desc">Book viewing</span></div>
+        <div class="api-route"><span class="method put">PUT</span><span class="route-path">/appointments/:id</span><span class="route-desc">Confirm / reschedule</span></div>
+      </div>
+      <div class="api-group">
+        <div class="api-base">🔌 Socket.io — Real-time Events</div>
+        <div class="api-route"><span class="method get">WS</span><span class="route-path">inquiry:new</span><span class="route-desc">Push to agent dashboard</span></div>
+        <div class="api-route"><span class="method get">WS</span><span class="route-path">chat:message</span><span class="route-desc">Live buyer-agent chat</span></div>
+        <div class="api-route"><span class="method get">WS</span><span class="route-path">listing:update</span><span class="route-desc">Status change broadcast</span></div>
+      </div>
+    </div>
+
+    <!-- SECURITY -->
+    <div id="security" class="section">
+      <h2>Security Architecture</h2>
+      <div class="sec-grid">
+        <div class="sec-item"><div class="sec-icon">🪖</div><div><div class="sec-title">Helmet.js</div><div class="sec-desc">HTTP security headers (CSP, HSTS, X-Frame-Options) on every Express response</div></div></div>
+        <div class="sec-item"><div class="sec-icon">🔒</div><div><div class="sec-title">JWT + Refresh Token Rotation</div><div class="sec-desc">Short-lived access tokens (15m) + long-lived refresh with automatic rotation on use</div></div></div>
+        <div class="sec-item"><div class="sec-icon">🚦</div><div><div class="sec-title">Rate Limiting</div><div class="sec-desc">express-rate-limit on auth routes (5 req/min), Redis-backed window for API routes</div></div></div>
+        <div class="sec-item"><div class="sec-icon">🛡️</div><div><div class="sec-title">RBAC Permissions</div><div class="sec-desc">Roles: buyer, agent, admin, super-admin. Middleware guards on every protected route</div></div></div>
+        <div class="sec-item"><div class="sec-icon">🧹</div><div><div class="sec-title">Input Sanitization</div><div class="sec-desc">express-mongo-sanitize, xss-clean, DOMPurify on client. Zod schema validation on all inputs</div></div></div>
+        <div class="sec-item"><div class="sec-icon">🖼️</div><div><div class="sec-title">Cloudinary Signed Uploads</div><div class="sec-desc">Server-side signed upload presets. No direct client-to-Cloudinary writes. File type + size validation</div></div></div>
+        <div class="sec-item"><div class="sec-icon">🔑</div><div><div class="sec-title">CSRF Protection</div><div class="sec-desc">Double-submit cookie pattern on all state-mutating requests. SameSite=Strict cookies</div></div></div>
+        <div class="sec-item"><div class="sec-icon">📊</div><div><div class="sec-title">Sentry + Audit Logs</div><div class="sec-desc">Error tracking, performance monitoring, admin action audit trail stored in DB</div></div></div>
+      </div>
+    </div>
+
+    <!-- ROADMAP -->
+    <div id="roadmap" class="section">
+      <h2>Development Roadmap — 6 Phases</h2>
+      <div class="phases">
+        <div class="phase">
+          <div class="phase-num">1</div>
+          <div class="phase-body">
+            <div class="phase-title">Phase 1 — Foundation & UI System (Weeks 1–3)</div>
+            <div class="phase-tasks">
+              <span class="task">Monorepo setup (Turborepo)</span><span class="task">Next.js 15 + TS scaffold</span><span class="task">TailwindCSS config</span><span class="task">Shadcn/UI base</span><span class="task">Global design tokens</span><span class="task">Navbar + Footer</span><span class="task">GSAP plugin setup</span><span class="task">Lenis scroll</span>
+            </div>
+          </div>
+        </div>
+        <div class="phase">
+          <div class="phase-num">2</div>
+          <div class="phase-body">
+            <div class="phase-title">Phase 2 — Core Frontend Pages (Weeks 4–7)</div>
+            <div class="phase-tasks">
+              <span class="task">Properties Home hero</span><span class="task">Featured listings grid</span><span class="task">Property detail page</span><span class="task">Developers page</span><span class="task">GSAP ScrollTrigger animations</span><span class="task">Responsive breakpoints</span><span class="task">Search + filter UI</span><span class="task">Map integration</span>
+            </div>
+          </div>
+        </div>
+        <div class="phase">
+          <div class="phase-num">3</div>
+          <div class="phase-body">
+            <div class="phase-title">Phase 3 — Backend APIs (Weeks 8–11)</div>
+            <div class="phase-tasks">
+              <span class="task">Express + TS setup</span><span class="task">MongoDB Atlas connect</span><span class="task">All REST routes</span><span class="task">JWT auth system</span><span class="task">Cloudinary integration</span><span class="task">Redis caching layer</span><span class="task">Socket.io server</span><span class="task">Email service</span>
+            </div>
+          </div>
+        </div>
+        <div class="phase">
+          <div class="phase-num">4</div>
+          <div class="phase-body">
+            <div class="phase-title">Phase 4 — Admin Dashboard + CMS (Weeks 12–14)</div>
+            <div class="phase-tasks">
+              <span class="task">Admin login + RBAC</span><span class="task">Property CRUD</span><span class="task">Image upload manager</span><span class="task">Inquiry CRM</span><span class="task">Appointment system</span><span class="task">Analytics charts</span><span class="task">Agent management</span>
+            </div>
+          </div>
+        </div>
+        <div class="phase">
+          <div class="phase-num">5</div>
+          <div class="phase-body">
+            <div class="phase-title">Phase 5 — SEO, Performance & Testing (Weeks 15–17)</div>
+            <div class="phase-tasks">
+              <span class="task">Dynamic metadata (Next.js)</span><span class="task">Schema.org markup</span><span class="task">OpenGraph images</span><span class="task">Sitemap generation</span><span class="task">Lighthouse 90+ score</span><span class="task">Unit + integration tests</span><span class="task">E2E (Playwright)</span><span class="task">Edge caching</span>
+            </div>
+          </div>
+        </div>
+        <div class="phase">
+          <div class="phase-num">6</div>
+          <div class="phase-body">
+            <div class="phase-title">Phase 6 — DevOps, Launch & Monitoring (Week 18+)</div>
+            <div class="phase-tasks">
+              <span class="task">Docker containerization</span><span class="task">GitHub Actions CI/CD</span><span class="task">NGINX config</span><span class="task">Vercel deployment</span><span class="task">Railway/AWS backend</span><span class="task">Sentry monitoring</span><span class="task">Load testing (k6)</span><span class="task">Go live 🚀</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+function show(id,el){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  el.classList.add('active');
+}
+</script>
